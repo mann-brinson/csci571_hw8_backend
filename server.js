@@ -6,6 +6,7 @@ const axios = require('axios');
 // Create app
 var app = express();
 app.use(cors());
+app.set('json spaces', 2);
 
 // ROUTES
 app.get('/', function(req, res) {
@@ -75,37 +76,8 @@ app.get('/', function(req, res) {
     requests = url_list.map(url => {
         return buildReq(url)
     })
-    
+
     //WORKING
-    //Send requests asynchronously, then process all responses
-    // axios.all(requests).then(axios.spread((...responses) => {
-
-    //     //For each response, for each movie object, parse out the desired features
-    //     // based on list_type (ex: "now_playing", "trending", ...)
-    //     var output = {}
-    //     responses.forEach((response, i) => {
-            
-    //         list_type = list_types[i]
-    //         const movie_list_extracted = []
-    //         //INNER LOOP
-    //         response.data.results.forEach((movie_obj, j) => {
-    //             // console.log({j: list_type}) //Works
-
-    //             result = extract_details(movie_obj, list_type)
-    //             // console.log(result) //Works
-
-    //             movie_list_extracted.push(result)
-    //         })
-    //         // console.log(movie_list_extracted) //Test
-    //         output[list_type] = movie_list_extracted
-    //     })
-    //     res.send(output)
-
-    //   })).catch(errors => {
-    //     // react on errors.
-    //   })
-
-    //TEST
     //Send requests asynchronously, then process all responses
     axios.all(requests).then(axios.spread((...responses) => {
 
@@ -128,11 +100,17 @@ app.get('/', function(req, res) {
 
                 movie_list_extracted.push(result)
             })
-            console.log(movie_list_extracted) //Test
-            output[list_type] = movie_list_extracted
+            
+            //Associate the list_type with the extracted movies/tv_shows
+            var obj_list = new Object()
+            obj_list[list_type] = movie_list_extracted
+            if (!(entity_type in output)) {
+                output[entity_type] = [obj_list]
+            } else {
+                output[entity_type].push(obj_list)
+            }
         })
-        res.send("test")
-        // res.send(output)
+        res.send(output)
 
       })).catch(errors => {
         // react on errors.

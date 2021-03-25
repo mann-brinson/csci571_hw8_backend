@@ -8,7 +8,18 @@ var app = express();
 app.use(cors());
 app.set('json spaces', 2);
 
-// ROUTES
+//GLOBAL PARAMETERS
+var api_key = "2e510746ca28d7041056c7e57108de4c"
+
+// GLOBAL FUNCTIONS
+function buildReq(url) {
+    //Construct a request object for each url
+    const req = axios.get(url);
+    return req
+}
+
+//////////// ROUTES
+//// HOME
 app.get('/', function(req, res) {
 
     ////  GOAL: For each list_type, construct url, hit the endpoint and get 20 items
@@ -17,7 +28,7 @@ app.get('/', function(req, res) {
     var list_types = ["popular", "top_rated", "trending"]
 
     var head_el_pair = ["movie", "now_playing"]
-    var api_key = "2e510746ca28d7041056c7e57108de4c"
+    // var api_key = "2e510746ca28d7041056c7e57108de4c"
     // TODO: Get now_playing separately
     
     //Construct entity_listtype pairs, used in url construction later
@@ -141,13 +152,93 @@ app.get('/', function(req, res) {
       })).catch(errors => {
         // react on errors.
       })
-
-
 })
 
-app.get('/products/:id', function (req, res, next) {
-    res.json({msg: 'This is CORSenabled for all origins!'})
-    });
+//// DETAILS PAGE
+app.get('/watch/:entity/:tmdb_id', function (req, res) {
+
+    //MOVIE-CENTRIC INSTRUCTIONS
+    // if (req.params.entity == "movie") {
+    // }
+
+    // res.send(req.params.entity) //TEST: Show the url params
+    entity = req.params.entity
+    tmdb_id = req.params.tmdb_id
+
+    //Build requests
+    url_detail = `https://api.themoviedb.org/3/${entity}/${tmdb_id}?api_key=${api_key}`
+    url_video = `https://api.themoviedb.org/3/${entity}/${tmdb_id}/videos?api_key=${api_key}`
+    url_credits = `https://api.themoviedb.org/3/${entity}/${tmdb_id}/credits?api_key=${api_key}`
+    url_reviews = `https://api.themoviedb.org/3/${entity}/${tmdb_id}/reviews?api_key=${api_key}`
+    urls = [["detail", url_detail], ["credits", url_credits], 
+            ["reviews", url_reviews], ["video", url_video]]
+    console.log(urls)
+
+    requests = []
+    urls.forEach((url) => {
+        req = buildReq(url[1])
+        requests.push(req)
+    })
+
+    // console.log("made it here")
+    // res.send("made it here")
+    
+    //// PARSING FUNCTIONS
+    // DETAIL 
+    function parseDetail(obj, entity) {
+        //Extract only necessary features from movie_obj
+        var result = {}
+        if (entity == "movie") {
+            result["name"] = obj.title
+            result["release_date"] = obj.release_date
+            result["runtime"] = obj.runtime
+
+        } 
+        else {
+            result["name"] = obj.name
+            result["first_air_date"] = obj.first_air_date
+            result["runtime"] = obj.episode_run_time
+        }
+
+        result["genres"] = obj.genres.map(item => item.name)
+        result["spoken_languages"] = obj.spoken_languages.map(item => item.english_name)
+        result["overview"] = obj.overview
+        result["tagline"] = obj.tagline
+        result["vote_average"] = obj.vote_average
+
+        return result
+    }
+    // VIDEO
+    // CREDITS
+    // REVIEWS
+
+    axios.all(requests).then(axios.spread((...responses) => {
+
+        //Parse desired features from each response,
+        // based on the response type (ex: "detail", "credits", "reviews")
+        var output = {}
+
+        //// DETAIL
+        //Extract movie features
+        console.log(responses[0].data)
+        console.log(entity)
+        // detail = responses[0].data.map((obj) => parseDetail(obj, entity))
+        obj = responses[0].data
+        detail = parseDetail(obj, entity)
+        output["detail"] = detail
+
+        //// VIDEO
+        //// CREDITS
+        //// REVIEWS
+        // res.send("made it")
+        res.send(output)
+
+      })).catch(errors => {
+        // react on errors.
+      })
+
+
+  })
 
 // LOGGING
 var server = app.listen(8080, function() {

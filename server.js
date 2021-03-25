@@ -237,10 +237,53 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
         }
         return result
     }
-        
     
     // CREDITS
+    function parseCredits(obj) {
+        var result = []
+        obj.cast.forEach((person) => {
+            var record = {}
+            record["id"] = person.id
+            record["name"] = person.name
+            record["character"] = person.character
+            if (person.profile_path == null) {
+                record["profile_path"] = "https://bytes.usc.edu/cs571/s21_JSwasm00/hw/HW6/imgs/person-placeholder.png"
+            } else {
+                record["profile_path"] = `https://image.tmdb.org/t/p/w500/${person.profile_path}`
+            }
+            result.push(record)
+        })
+        return result
+    }
     // REVIEWS
+    function parseReviews(obj) {
+        var result = []
+        obj.results.forEach((review) => {
+            var record = {}
+            record["author"] = review.author
+            record["content"] = review.content
+            record["created_at"] = review.created_at
+            record["url"] = review.url
+
+            if (review.author_details.rating == null) {
+                record["rating"] = 0
+            } else {
+                record["rating"] = Math.round(review.author_details.rating)
+            }
+            if (review.author_details.avatar_path == null) {
+                record["avatar_path"] = "https://bytes.usc.edu/cs571/s21_JSwasm00/hw/HW8/ReviewsPlaceholderImage.jpg"
+            } else {
+                avatar_path = review.author_details.avatar_path
+                if (avatar_path.substr(0, 5) == "https") {
+                    record["avatar_path"] = avatar_path
+                } else {
+                    record["avatar_path"] = `https://image.tmdb.org/t/p/original${avatar_path}`
+                }
+            }
+            result.push(record)
+        })
+        return result
+    }
 
     axios.all(requests).then(axios.spread((...responses) => {
 
@@ -259,14 +302,21 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
         output["video"] = video
 
         //// CREDITS
+        obj = responses[2].data
+        credits = parseCredits(obj)
+        output["credits"] = credits
+
         //// REVIEWS
+        obj = responses[3].data
+        reviews = parseReviews(obj)
+        output["reviews"] = reviews
+
         // res.send("made it")
         res.send(output)
 
       })).catch(errors => {
         // react on errors.
       })
-
 
   })
 

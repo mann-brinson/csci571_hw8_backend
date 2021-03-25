@@ -357,6 +357,23 @@ app.get('/person/:person_id', function (req, res) {
         return result
     }
 
+    function parseExternalIds(obj) {
+        var result = {}
+        if (obj.imdb_id != null) {
+            result.imdb_id = `https://www.imdb.com/name/${obj.imdb_id}`
+        }
+        if (obj.facebook_id != null) {
+            result.facebook_id = `https://www.facebook.com/${obj.facebook_id}`
+        }
+        if (obj.instagram_id != null) {
+            result.instagram_id = `https://www.instagram.com/${obj.instagram_id}`
+        }
+        if (obj.twitter_id != null) {
+            result.instagram_id = `https://www.twitter.com/${obj.twitter_id}`
+        }
+        return result
+    }
+
     axios.all(requests).then(axios.spread((...responses) => {
         //Parse desired features from each response,
         // based on the response type (ex: "person", "externalIds")
@@ -364,11 +381,13 @@ app.get('/person/:person_id', function (req, res) {
 
         //// PERSON
         obj = responses[0].data
-        console.log(obj.profile_path)
         person = parsePerson(obj)
         output["person"] = person
 
         //// EXTERNALIDS
+        obj = responses[1].data
+        externalIds = parseExternalIds(obj)
+        output["externalIds"] = externalIds
 
         // res.send("made it")
         res.send(output)

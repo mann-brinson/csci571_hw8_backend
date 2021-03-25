@@ -157,11 +157,8 @@ app.get('/', function(req, res) {
 //// DETAILS PAGE
 app.get('/watch/:entity/:tmdb_id', function (req, res) {
 
-    //MOVIE-CENTRIC INSTRUCTIONS
-    // if (req.params.entity == "movie") {
-    // }
-
     // res.send(req.params.entity) //TEST: Show the url params
+    //Get query parameters
     entity = req.params.entity
     tmdb_id = req.params.tmdb_id
 
@@ -172,7 +169,7 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
     url_reviews = `https://api.themoviedb.org/3/${entity}/${tmdb_id}/reviews?api_key=${api_key}`
     urls = [["detail", url_detail], ["video", url_video],
             ["credits", url_credits], ["reviews", url_reviews]]
-    console.log(urls)
+    // console.log(urls)
 
     requests = []
     urls.forEach((url) => {
@@ -286,7 +283,6 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
     }
 
     axios.all(requests).then(axios.spread((...responses) => {
-
         //Parse desired features from each response,
         // based on the response type (ex: "detail", "credits", "reviews")
         var output = {}
@@ -319,6 +315,68 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
       })
 
   })
+
+//// PERSON PAGE
+app.get('/person/:person_id', function (req, res) {
+    // res.send(req.params.person_id) //TEST: Show the url params
+
+    //Get query params
+    person_id = req.params.person_id
+
+    //Build requests
+    url_person = `https://api.themoviedb.org/3/person/${person_id}?api_key=${api_key}`
+    url_externalIds = `https://api.themoviedb.org/3/person/${person_id}/external_ids?api_key=${api_key}`
+    urls = [["person", url_person], ["externalIds", url_externalIds]]
+
+    requests = []
+    urls.forEach((url) => {
+        req = buildReq(url[1])
+        requests.push(req)
+    })
+
+    //// PARSING FUNCTIONS
+    function parsePerson(obj) {
+        var result = {}
+
+        if (obj["gender"] == 1) {result["gender"] = "female"}
+        else if (obj["gender"] == 2) {result["gender"] = "male"}
+        else {result["gender"] = "undefined"}
+
+        if (obj.profile_path == null) {
+            result["profile_path"] = "https://bytes.usc.edu/cs571/s21_JSwasm00/hw/HW6/imgs/person-placeholder.png"
+        } else {
+            result["profile_path"] = `https://image.tmdb.org/t/p/w500${obj.profile_path}`
+        }
+
+        result["birthday"] = obj.birthday
+        result["name"] = obj.name
+        result["homepage"] = obj.homepage
+        result["also_known_as"] = obj.also_known_as
+        result["known_for"] = obj.known_for_department
+        result["biography"] = obj.biography
+        return result
+    }
+
+    axios.all(requests).then(axios.spread((...responses) => {
+        //Parse desired features from each response,
+        // based on the response type (ex: "person", "externalIds")
+        var output = {}
+
+        //// PERSON
+        obj = responses[0].data
+        console.log(obj.profile_path)
+        person = parsePerson(obj)
+        output["person"] = person
+
+        //// EXTERNALIDS
+
+        // res.send("made it")
+        res.send(output)
+
+      })).catch(errors => {
+        // react on errors.
+      })
+})
 
 // LOGGING
 var server = app.listen(8080, function() {

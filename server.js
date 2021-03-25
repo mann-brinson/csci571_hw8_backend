@@ -170,8 +170,8 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
     url_video = `https://api.themoviedb.org/3/${entity}/${tmdb_id}/videos?api_key=${api_key}`
     url_credits = `https://api.themoviedb.org/3/${entity}/${tmdb_id}/credits?api_key=${api_key}`
     url_reviews = `https://api.themoviedb.org/3/${entity}/${tmdb_id}/reviews?api_key=${api_key}`
-    urls = [["detail", url_detail], ["credits", url_credits], 
-            ["reviews", url_reviews], ["video", url_video]]
+    urls = [["detail", url_detail], ["video", url_video],
+            ["credits", url_credits], ["reviews", url_reviews]]
     console.log(urls)
 
     requests = []
@@ -186,29 +186,59 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
     //// PARSING FUNCTIONS
     // DETAIL 
     function parseDetail(obj, entity) {
-        //Extract only necessary features from movie_obj
         var result = {}
         if (entity == "movie") {
             result["name"] = obj.title
             result["release_date"] = obj.release_date
             result["runtime"] = obj.runtime
-
         } 
         else {
             result["name"] = obj.name
             result["first_air_date"] = obj.first_air_date
-            result["runtime"] = obj.episode_run_time
+            result["runtime"] = obj.episode_run_time[0]
         }
-
         result["genres"] = obj.genres.map(item => item.name)
         result["spoken_languages"] = obj.spoken_languages.map(item => item.english_name)
         result["overview"] = obj.overview
         result["tagline"] = obj.tagline
         result["vote_average"] = obj.vote_average
-
         return result
     }
+
     // VIDEO
+    function parseVideo(obj, entity) {
+        var trailers = []
+        var teasers = []
+        obj.results.forEach((video) => {
+            if (video.site == "YouTube") {
+                if (video.type == "Trailer") {trailers.push(video)}
+                else if (video.type == "Teaser") {teasers.push(video)}
+            }
+        })
+
+        var result = {}
+        if (trailers.length > 0) {
+            result["site"] = trailers[0].site
+            result["type"] = trailers[0].type
+            result["name"] = trailers[0].name
+            result["key"] = trailers[0].key
+        }
+        else if (teasers.length > 0) {
+            result["site"] = trailers[0].site
+            result["type"] = trailers[0].type
+            result["name"] = trailers[0].name
+            result["key"] = trailers[0].key
+        }
+        else {
+            result["site"] = "YouTube"
+            result["type"] = "Default"
+            result["name"] = "No Video Found."
+            result["key"] = "tzkWB85ULJY"
+        }
+        return result
+    }
+        
+    
     // CREDITS
     // REVIEWS
 
@@ -219,15 +249,15 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
         var output = {}
 
         //// DETAIL
-        //Extract movie features
-        console.log(responses[0].data)
-        console.log(entity)
-        // detail = responses[0].data.map((obj) => parseDetail(obj, entity))
         obj = responses[0].data
         detail = parseDetail(obj, entity)
         output["detail"] = detail
 
         //// VIDEO
+        obj = responses[1].data
+        video = parseVideo(obj, entity)
+        output["video"] = video
+
         //// CREDITS
         //// REVIEWS
         // res.send("made it")

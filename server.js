@@ -397,7 +397,79 @@ app.get('/person/:person_id', function (req, res) {
       })
 })
 
+//// SEARCH PAGE
+app.get('/search/:terms', function (req, res) {
+
+    //Get query params
+    terms = req.params.terms
+
+    //Build request
+    url_search = `https://api.themoviedb.org/3/search/multi?api_key=${api_key}&language=en-US&query=${terms}`
+    requests = []
+    req = buildReq(url_search)
+    requests.push(req)
+
+    //// PARSING FUNCTIONS
+    function parseSearchResults(obj) {
+        var result = []
+
+        if (obj.total_results == 0) {
+            return "no results found"
+        } else (
+            obj.results.forEach((s_result, i) => {
+
+                if (i < 7) { //Show only the top 7 records
+                    console.log(s_result)
+                    record = {}
+
+                    record["id"] = s_result.id
+                    record["media_type"] = s_result.media_type
+
+                    if (s_result.media_type == "tv") {
+                        record["name"] = s_result.name
+                    } else if (s_result.media_type == "movie") {
+                        record["name"] = s_result.title
+                    }
+
+                    if (s_result.backdrop_path == null) {
+                        record["backdrop_path"] = "https://bytes.usc.edu/cs571/s21_JSwasm00/hw/HW6/imgs/movie-placeholder.jpg"
+                    } else {
+                        record["backdrop_path"] = "https://image.tmdb.org/t/p/original" + s_result.backdrop_path
+                    }
+                    result.push(record)
+                }
+            })
+        )
+        return result
+    }
+
+    axios.all(requests).then(axios.spread((...responses) => {
+        //Parse desired features from each response,
+        // based on the response type (ex: "person", "externalIds")
+        var output = {}
+
+        // res.send("made it")
+        obj = responses[0].data
+        // res.send(obj)
+
+        result = parseSearchResults(obj)
+        res.send(result)
+
+        // SEARCH RESULTS
+
+      })).catch(errors => {
+        // react on errors.
+      })
+
+})
+
 // LOGGING
 var server = app.listen(8080, function() {
     console.log("Backend Application listening at http://localhost:8080")
 })
+
+// entity_types.forEach((entity) => {
+//     list_types.forEach((listtype) => {
+//         entity_listtypes.push([entity, listtype])
+//     })
+// }) 

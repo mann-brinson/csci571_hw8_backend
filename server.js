@@ -194,6 +194,14 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
             result["first_air_date"] = obj.first_air_date
             result["runtime"] = obj.episode_run_time[0]
         }
+        if (obj.poster_path == null) {
+            result["poster_path"] = "https://cinemaone.net/images/movie_placeholder.png"
+        }
+        else {
+            result["poster_path"] = "https://image.tmdb.org/t/p/w500" + obj.poster_path
+        }
+
+        result["tmdb_id"] = obj.id
         result["genres"] = obj.genres.map(item => item.name)
         result["spoken_languages"] = obj.spoken_languages.map(item => item.english_name)
         result["overview"] = obj.overview

@@ -44,10 +44,8 @@ app.get('/', function(req, res) {
     function buildURL(api_key, entity_type, list_type) {
         //For each list_type, build a url
         if (list_type != "trending") {
-            // var url_components = ["https://api.themoviedb.org/3/movie/", list_type, "?api_key=", api_key]
             var url_full = `https://api.themoviedb.org/3/${entity_type}/${list_type}?api_key=${api_key}`
         } else {
-            // var url_components = ["https://api.themoviedb.org/3/", list_type, "/movie/day?api_key=", api_key]
             var url_full = `https://api.themoviedb.org/3/${list_type}/${entity_type}/day?api_key=${api_key}`
         }
         // url_full = url_components.join('')
@@ -163,12 +161,17 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
     tmdb_id = req.params.tmdb_id
 
     //Build requests
-    url_detail = `https://api.themoviedb.org/3/${entity}/${tmdb_id}?api_key=${api_key}`
-    url_video = `https://api.themoviedb.org/3/${entity}/${tmdb_id}/videos?api_key=${api_key}`
-    url_credits = `https://api.themoviedb.org/3/${entity}/${tmdb_id}/credits?api_key=${api_key}`
-    url_reviews = `https://api.themoviedb.org/3/${entity}/${tmdb_id}/reviews?api_key=${api_key}`
+    url_root = "https://api.themoviedb.org/3/"
+    url_detail = `${url_root}${entity}/${tmdb_id}?api_key=${api_key}`
+    url_video = `${url_root}${entity}/${tmdb_id}/videos?api_key=${api_key}`
+    url_credits = `${url_root}${entity}/${tmdb_id}/credits?api_key=${api_key}`
+    url_reviews = `${url_root}${entity}/${tmdb_id}/reviews?api_key=${api_key}`
+    url_recommended = `${url_root}${entity}/${tmdb_id}/recommendations?api_key=${api_key}`
+    url_similar = `${url_root}${entity}/${tmdb_id}/similar?api_key=${api_key}`
+
     urls = [["detail", url_detail], ["video", url_video],
-            ["credits", url_credits], ["reviews", url_reviews]]
+            ["credits", url_credits], ["reviews", url_reviews],
+            ["recommended", url_recommended], ["similar", url_similar]]
     // console.log(urls)
 
     requests = []
@@ -290,6 +293,36 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
         return result
     }
 
+    // RECOMMENDED, SIMILAR
+    function parseRecommendedSimilar(obj, entity) {
+        //Extract only necessary features from movie_obj
+        var result = []
+        if (obj.results.length == 0) {
+            return result
+        } else {
+            obj.results.forEach((item, i ) => {
+                if (i < 20) { //Grab only the top 20
+                    var record = {}
+                    record["id"] = item.id
+        
+                    if (entity == "movie") {
+                        record["name"] = item.title
+                    } else {
+                        record["name"] = item.name
+                    }
+    
+                    if (item.poster_path == null) {
+                        record["poster_path"] = "https://cinemaone.net/images/movie_placeholder.png"
+                    } else {
+                        record["poster_path"] = "https://image.tmdb.org/t/p/w500" + item.poster_path
+                    }
+                    result.push(record)
+                }
+            })
+        }
+        return result
+    }
+
     axios.all(requests).then(axios.spread((...responses) => {
         //Parse desired features from each response,
         // based on the response type (ex: "detail", "credits", "reviews")
@@ -314,6 +347,16 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
         obj = responses[3].data
         reviews = parseReviews(obj)
         output["reviews"] = reviews
+
+        //// RECOMMENDED
+        obj = responses[4].data
+        recommended = parseRecommendedSimilar(obj, entity)
+        output["recommended"] = recommended
+
+        //// SIMILAR
+        obj = responses[5].data
+        similar = parseRecommendedSimilar(obj, entity)
+        output["similar"] = similar
 
         // res.send("made it")
         res.send(output)

@@ -62,6 +62,8 @@ app.get('/', function(req, res) {
         //Extract only necessary features from movie_obj
         var result = {}
         result["id"] = obj.id
+        result["entity_type"] = entity_type
+        // result["test"] = "test"
 
         if (entity_type == "movie") {
             result["name"] = obj.title

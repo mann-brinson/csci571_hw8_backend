@@ -402,9 +402,13 @@ app.get('/person/:person_id', function (req, res) {
             result["profile_path"] = `https://image.tmdb.org/t/p/w500${obj.profile_path}`
         }
 
-        result["birthday"] = obj.birthday
+        if (obj.birthday == null) {result["birthday"] = ""}
+        else {result["birthday"] = obj.birthday}
+
+        if (obj.homepage == null) {result["homepage"] = ""}
+        else {result["homepage"] = obj.homepage}
+        
         result["name"] = obj.name
-        result["homepage"] = obj.homepage
         result["also_known_as"] = obj.also_known_as
         result["known_for"] = obj.known_for_department
         result["biography"] = obj.biography
@@ -412,18 +416,23 @@ app.get('/person/:person_id', function (req, res) {
     }
 
     function parseExternalIds(obj) {
-        var result = {}
+        // var result = {}
+        var result = []
         if (obj.imdb_id != null) {
-            result.imdb_id = `https://www.imdb.com/name/${obj.imdb_id}`
+            // result.imdb_id = `https://www.imdb.com/name/${obj.imdb_id}`
+            result.push({"imdb_id": `https://www.imdb.com/name/${obj.imdb_id}`})
         }
         if (obj.facebook_id != null) {
-            result.facebook_id = `https://www.facebook.com/${obj.facebook_id}`
+            // result.facebook_id = `https://www.facebook.com/${obj.facebook_id}`
+            result.push({"facebook_id": `https://www.facebook.com/${obj.facebook_id}`})
         }
         if (obj.instagram_id != null) {
-            result.instagram_id = `https://www.instagram.com/${obj.instagram_id}`
+            // result.instagram_id = `https://www.instagram.com/${obj.instagram_id}`
+            result.push({"instagram_id": `https://www.instagram.com/${obj.instagram_id}`})
         }
         if (obj.twitter_id != null) {
-            result.instagram_id = `https://www.twitter.com/${obj.twitter_id}`
+            // result.twitter_id = `https://www.twitter.com/${obj.twitter_id}`
+            result.push({"twitter_id": `https://www.twitter.com/${obj.twitter_id}`})
         }
         return result
     }

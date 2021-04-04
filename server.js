@@ -309,8 +309,10 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
         
                     if (entity == "movie") {
                         record["name"] = item.title
+                        record["entity_type"] = "movie"
                     } else {
                         record["name"] = item.name
+                        record["entity_type"] = "tv"
                     }
     
                     if (item.poster_path == null) {
@@ -366,7 +368,6 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
       })).catch(errors => {
         // react on errors.
       })
-
   })
 
 //// PERSON PAGE

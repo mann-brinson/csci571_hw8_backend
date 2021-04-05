@@ -280,15 +280,18 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
             } else {
                 record["rating"] = Math.round(review.author_details.rating)
             }
+
             if (review.author_details.avatar_path == null) {
                 record["avatar_path"] = "https://bytes.usc.edu/cs571/s21_JSwasm00/hw/HW8/ReviewsPlaceholderImage.jpg"
             } else {
                 avatar_path = review.author_details.avatar_path
-                if (avatar_path.substr(0, 5) == "https") {
-                    record["avatar_path"] = avatar_path
+                console.log({"avatar_path before": avatar_path})
+                if (avatar_path.substr(0, 6) == "/https") {
+                    record["avatar_path"] = avatar_path.substr(1)
                 } else {
                     record["avatar_path"] = `https://image.tmdb.org/t/p/original${avatar_path}`
                 }
+                console.log({"avatar_path after": record["avatar_path"]})
             }
             result.push(record)
         })
@@ -419,23 +422,23 @@ app.get('/person/:person_id', function (req, res) {
     }
 
     function parseExternalIds(obj) {
-        // var result = {}
-        var result = []
+        var result = {}
+        // var result = []
         if (obj.imdb_id != null) {
-            // result.imdb_id = `https://www.imdb.com/name/${obj.imdb_id}`
-            result.push({"imdb_id": `https://www.imdb.com/name/${obj.imdb_id}`})
+            result.imdb_id = `https://www.imdb.com/name/${obj.imdb_id}`
+            // result.push({"imdb_id": `https://www.imdb.com/name/${obj.imdb_id}`})
         }
         if (obj.facebook_id != null) {
-            // result.facebook_id = `https://www.facebook.com/${obj.facebook_id}`
-            result.push({"facebook_id": `https://www.facebook.com/${obj.facebook_id}`})
+            result.facebook_id = `https://www.facebook.com/${obj.facebook_id}`
+            // result.push({"facebook_id": `https://www.facebook.com/${obj.facebook_id}`})
         }
         if (obj.instagram_id != null) {
-            // result.instagram_id = `https://www.instagram.com/${obj.instagram_id}`
-            result.push({"instagram_id": `https://www.instagram.com/${obj.instagram_id}`})
+            result.instagram_id = `https://www.instagram.com/${obj.instagram_id}`
+            // result.push({"instagram_id": `https://www.instagram.com/${obj.instagram_id}`})
         }
         if (obj.twitter_id != null) {
-            // result.twitter_id = `https://www.twitter.com/${obj.twitter_id}`
-            result.push({"twitter_id": `https://www.twitter.com/${obj.twitter_id}`})
+            result.twitter_id = `https://www.twitter.com/${obj.twitter_id}`
+            // result.push({"twitter_id": `https://www.twitter.com/${obj.twitter_id}`})
         }
         return result
     }

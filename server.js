@@ -405,6 +405,9 @@ app.get('/person/:person_id', function (req, res) {
         if (obj.birthday == null) {result["birthday"] = ""}
         else {result["birthday"] = obj.birthday}
 
+        if (obj.place_of_birth == null ) {result["birthplace"] = ""}
+        else {result["birthplace"] = obj.place_of_birth}
+
         if (obj.homepage == null) {result["homepage"] = ""}
         else {result["homepage"] = obj.homepage}
         

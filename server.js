@@ -20,7 +20,7 @@ function buildReq(url) {
 
 //////////// ROUTES
 //// HOME
-app.get('/', function(req, res) {
+app.get('/apis', function(req, res) {
 
     ////  GOAL: For each list_type, construct url, hit the endpoint and get 20 items
     //// PARAMETERS
@@ -153,7 +153,7 @@ app.get('/', function(req, res) {
 })
 
 //// DETAILS PAGE
-app.get('/watch/:entity/:tmdb_id', function (req, res) {
+app.get('/apis/watch/:entity/:tmdb_id', function (req, res) {
 
     // res.send(req.params.entity) //TEST: Show the url params
     //Get query parameters
@@ -366,7 +366,7 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
   })
 
 //// PERSON PAGE
-app.get('/person/:person_id', function (req, res) {
+app.get('/apis/person/:person_id', function (req, res) {
     // res.send(req.params.person_id) //TEST: Show the url params
 
     //Get query params
@@ -459,7 +459,7 @@ app.get('/person/:person_id', function (req, res) {
 })
 
 //// SEARCH PAGE
-app.get('/search/:terms', function (req, res) {
+app.get('/apis/search/:terms', function (req, res) {
 
     //Get query params
     terms = req.params.terms
@@ -524,6 +524,9 @@ app.get('/search/:terms', function (req, res) {
 })
 
 // LOGGING
-var server = app.listen(8080, function() {
+const PORT = process.env.PORT || 8080;
+var server = app.listen(PORT, function() {
     console.log("Backend Application listening at http://localhost:8080")
 })
+
+module.exports = app

@@ -2,11 +2,15 @@
 var express = require('express');
 var cors = require('cors');
 const axios = require('axios');
+const path = require('path')
 
 // Create app
 var app = express();
 app.use(cors());
 app.set('json spaces', 2);
+
+// Serve the frontend index.html
+app.use(express.static(path.join(__dirname, 'dist/frontend')));
 
 //GLOBAL PARAMETERS
 var api_key = "2e510746ca28d7041056c7e57108de4c"
@@ -521,6 +525,11 @@ app.get('/apis/search/:terms', function (req, res) {
         // react on errors.
       })
 
+})
+
+//// DEFAULT
+app.use('/*', function(req, res) {
+    res.sendFile(path.join(__dirname + '/dist/frontend/index.html'))
 })
 
 // LOGGING

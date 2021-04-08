@@ -29,7 +29,8 @@ __webpack_require__.r(__webpack_exports__);
 class HomepageService {
     constructor(http) {
         this.http = http;
-        this._url = 'http://localhost:8080/apis';
+        // private _url: string = 'http://localhost:8080/apis'; //TEST
+        this._url = 'https://csci571-hw8-nodejs-2021sp.wl.r.appspot.com/apis'; //PROD
     }
     // WORKING
     getHomepage() {
@@ -429,7 +430,8 @@ class MoviepageService {
         this.http = http;
     }
     getMoviepage(movie_id, entity_type) {
-        var url = `http://localhost:8080/apis/watch/${entity_type}/${movie_id}`;
+        // var url = `http://localhost:8080/apis/watch/${entity_type}/${movie_id}` //TEST
+        var url = `https://csci571-hw8-nodejs-2021sp.wl.r.appspot.com/apis/watch/${entity_type}/${movie_id}`; //PROD
         return this.http.get(url);
     }
 }
@@ -1766,7 +1768,8 @@ function TypeaheadComponent_ng_template_0_Template(rf, ctx) { if (rf & 1) {
     _angular_core__WEBPACK_IMPORTED_MODULE_2__["ɵɵproperty"]("result", r_r2.name)("term", t_r3);
 } }
 //// MOVIE APP
-const SEARCH_URL = 'http://localhost:8080/apis/search/';
+// const SEARCH_URL = 'http://localhost:8080/apis/search/'; //TEST
+const SEARCH_URL = 'https://csci571-hw8-nodejs-2021sp.wl.r.appspot.com/apis/search/'; //PROD
 class SearchService {
     constructor(http) {
         this.http = http;
@@ -2317,7 +2320,8 @@ class CastItemFullService {
     }
     // WORKING
     getCastItemFull(person_id) {
-        var cast_url = `http://localhost:8080/apis/person/${person_id}`; //REPLACE WITH GCP HOST
+        // var cast_url = `http://localhost:8080/apis/person/${person_id}`; //TEST
+        var cast_url = `https://csci571-hw8-nodejs-2021sp.wl.r.appspot.com/apis/person/${person_id}`; //PROD
         return this.http.get(cast_url);
     }
 }

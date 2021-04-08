@@ -37,8 +37,7 @@ app.get('/', function(req, res) {
         list_types.forEach((listtype) => {
             entity_listtypes.push([entity, listtype])
         })
-    }) 
-    console.log(entity_listtypes)
+    })
 
     ////  FUNCTIONS
     function buildURL(api_key, entity_type, list_type) {
@@ -108,7 +107,6 @@ app.get('/', function(req, res) {
                 entity_type = entity_listtypes[i][0]
                 list_type = entity_listtypes[i][1]
                 const movie_list_extracted = []
-                // console.log([entity_type, list_type]) //Works
     
                 //INNER LOOP
                 response.data.results.forEach((obj, j) => {
@@ -174,16 +172,12 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
     urls = [["detail", url_detail], ["video", url_video],
             ["credits", url_credits], ["reviews", url_reviews],
             ["recommended", url_recommended], ["similar", url_similar]]
-    // console.log(urls)
 
     requests = []
     urls.forEach((url) => {
         req = buildReq(url[1])
         requests.push(req)
     })
-
-    // console.log("made it here")
-    // res.send("made it here")
     
     //// PARSING FUNCTIONS
     // DETAIL 
@@ -285,13 +279,11 @@ app.get('/watch/:entity/:tmdb_id', function (req, res) {
                 record["avatar_path"] = "https://bytes.usc.edu/cs571/s21_JSwasm00/hw/HW8/ReviewsPlaceholderImage.jpg"
             } else {
                 avatar_path = review.author_details.avatar_path
-                console.log({"avatar_path before": avatar_path})
                 if (avatar_path.substr(0, 6) == "/https") {
                     record["avatar_path"] = avatar_path.substr(1)
                 } else {
                     record["avatar_path"] = `https://image.tmdb.org/t/p/original${avatar_path}`
                 }
-                console.log({"avatar_path after": record["avatar_path"]})
             }
             result.push(record)
         })
@@ -488,7 +480,6 @@ app.get('/search/:terms', function (req, res) {
             obj.results.forEach((s_result, i) => {
 
                 if (i < 7) { //Show only the top 7 records
-                    console.log(s_result)
                     record = {}
 
                     record["id"] = s_result.id
@@ -536,9 +527,3 @@ app.get('/search/:terms', function (req, res) {
 var server = app.listen(8080, function() {
     console.log("Backend Application listening at http://localhost:8080")
 })
-
-// entity_types.forEach((entity) => {
-//     list_types.forEach((listtype) => {
-//         entity_listtypes.push([entity, listtype])
-//     })
-// }) 

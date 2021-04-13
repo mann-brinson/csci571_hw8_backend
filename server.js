@@ -9,16 +9,6 @@ var app = express();
 app.use(cors());
 app.set('json spaces', 2)
 
-// Enable HTTPS requests
-const https = require('https');
-const fs = require('fs');
-
-const options = {
-  key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem')
-};
-
-
 // Serve the frontend index.html
 app.use(express.static(path.join(__dirname, 'dist/frontend')));
 
@@ -544,16 +534,10 @@ app.use('/*', function(req, res) {
 
 // LOGGING
 const PORT = process.env.PORT || 8080;
+
 // WORKING
 var server = app.listen(PORT, function() {
     console.log("Backend Application listening at http://localhost:8080")
 })
-
-//TEST - CREATE HTTPS SERVER
-// var server = https.createServer(options, app);
-
-// server.listen(PORT, () => {
-//   console.log("server starting on port : " + PORT)
-// });
 
 module.exports = app

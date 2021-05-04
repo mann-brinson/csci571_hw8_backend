@@ -460,14 +460,22 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class AppComponent {
-    constructor(titleService) {
+    constructor(titleService, metaService) {
         this.titleService = titleService;
+        this.metaService = metaService;
         this.title = 'USC Films';
         titleService.setTitle('USC Films');
+        metaService.addTags([
+            { property: 'og:title', content: 'Angular with Node.js Movie Finder' },
+            { property: 'og:url', content: 'https://csci571-hw8-nodejs-2021sp.wl.r.appspot.com/' },
+            { property: 'og:description', content: 'Example of Node.js backend with Angular frontend capabilities using a pre-built API from TMDB. Assignment for USC CSCI 571 (Web Technologies), Spring 2021.' },
+            { property: 'og:author', content: 'Mark Mann' },
+            { property: 'og:image', content: 'https://csci571-hw6-assets.s3-us-west-1.amazonaws.com/csci_hw8_angular_node2.jpeg' }
+        ]);
     }
     ;
 }
-AppComponent.ɵfac = function AppComponent_Factory(t) { return new (t || AppComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_platform_browser__WEBPACK_IMPORTED_MODULE_1__["Title"])); };
+AppComponent.ɵfac = function AppComponent_Factory(t) { return new (t || AppComponent)(_angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_platform_browser__WEBPACK_IMPORTED_MODULE_1__["Title"]), _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdirectiveInject"](_angular_platform_browser__WEBPACK_IMPORTED_MODULE_1__["Meta"])); };
 AppComponent.ɵcmp = _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵdefineComponent"]({ type: AppComponent, selectors: [["app-root"]], decls: 5, vars: 0, consts: [[1, "container-fluid", 2, "background-color", "rgb(5,8,51)", "color", "white", "min-height", "100vh", "height", "auto"], [1, "mt-auto"]], template: function AppComponent_Template(rf, ctx) { if (rf & 1) {
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelementStart"](0, "div", 0);
         _angular_core__WEBPACK_IMPORTED_MODULE_0__["ɵɵelement"](1, "app-nav-bar");
